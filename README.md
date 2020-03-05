@@ -8,3 +8,19 @@ Noelia López Rúa 54705
 
 ## Objetivos del trabajo
 Simular un cruce de una carretera con control de velocidad y semáforos.
+Programar en Arduino y estabecer una comunicación con C.
+
+## Lista de componentes
+Cables macho y hembra
+resistencias 
+leds de diferentes colores
+Active buzzer (la alarma)
+pulsadores
+Sensor ultrasonido
+pantalla LCD display
+7 segment display
+Arduino 1
+2 protoboards
+
+
+
