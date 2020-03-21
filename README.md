@@ -22,5 +22,7 @@ pantalla LCD display
 Arduino 1
 2 protoboards
 
+## Sensores y Actuadores
+Sensor de ultrasonidos que seria el radar de los vehículos.
 
 
