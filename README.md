@@ -19,29 +19,31 @@ Anprender a usar lenguaje hmtl.
 Usar ficheros.
 
 ## Subprogramas (funciones)
-Función menú:
-  En esta función se procesará la opción elegida por el usuario.
-  int menu()
-  {
-	   int opcion;
-	   do
-	   {
-		    printf("Menu:\n");
-		    print("1.Abrir\n");
-	    	printf("2.Guardar\n");
-		    printf("3.Ver\n");
-	    	printf("4.Salir\n");
-		    scanf ("%d",&opcion);
-	   } 
-	   while ((opcion<1) || (opcion>4));	 
- return opcion;
- }
- 
-Función abrir:
-   Abrir página html y mostrar enlaces existentes.
-   
-Función guardar:
-   Almacenar en un fichero los enlaces detectados por la función abrir.
 
-Función ver:
-    Identificar qué enlaces de los anteriores son imágenes y mostrar las mismas en pantalla.
+### Función menú:
+	En esta función se procesará la opción elegida por el usuario.
+  
+	int menu()
+	{
+	 int opcion;
+	 do
+	 {
+		printf("Menu:\n");
+		print("1.Abrir\n");
+	    	printf("2.Guardar\n");
+		printf("3.Ver\n");
+	    	printf("4.Salir\n");
+		scanf ("%d",&opcion);
+	   } 
+	   while ((opcion<1) || (opcion>4)); 
+ 	return opcion;
+ 	}
+ 
+### Función abrir:
+	Abrir página html y mostrar enlaces existentes.
+   
+### Función guardar:
+	Almacenar en un fichero los enlaces detectados por la función abrir.
+
+###  Función ver:
+	Identificar qué enlaces de los anteriores son imágenes y mostrar las mismas en pantalla.
