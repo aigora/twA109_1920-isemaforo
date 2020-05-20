@@ -1,0 +1,284 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define L 100
+#define OUT_QUOTES 0
+#define IN_QUOTES 1
+
+struct elemento   // Se declara una estructura base que conforma los nodos de una lista enlazada de urls o imagenes
+{
+  char cadena[L];
+  struct elemento *siguiente;
+};
+
+typedef struct elemento NODO;
+
+int menu(void);
+void funcion_leer(FILE*);
+FILE* funcion_guardar(FILE *);
+void funcion_imagenes(FILE *);
+NODO * procesar_fichero(FILE *); // Recibe un descriptor de un fichero y devuelve una lista con las URLs
+NODO * procesa_cadena (char [],NODO *);   // Recibe una cadena y si es una url la inserta en la lista
+void imprime_lista (NODO *); // Recorre una lista de NODO e imprime las URL
+void imprime_guardar (NODO *p, FILE *fichero);//imprime en el fichero nuevo las URLS
+NODO * procesar_fichero_imagenes(FILE *); // Recibe un descriptor de un fichero y devuelve una lista con las imagenes
+NODO * procesa_cadena_imagenes (char [],NODO *);   // Recibe una cadena y si es una imagen la inserta en la lista
+void imprime_lista_imagenes (NODO *); // Recorre una lista de NODO e imprime las imagenes
+
+int main(void)
+{
+    int opcion = 0;
+    char nombre_html[L];
+    FILE*fentrada;
+    
+    do
+    {
+        printf ("Introduzca nombre completo del fichero HTML:");
+        scanf ("%s",nombre_html);
+    
+        fentrada = fopen (nombre_html,"rt");
+          if (fentrada == NULL)
+            printf ("El fichero HTML %s no existe\n",nombre_html);
+        else
+        {
+             opcion=menu();
+    
+            switch (opcion)
+                 {
+                case 1: funcion_leer(fentrada);
+                         break;
+                case 2: funcion_guardar(fentrada);
+                         break;
+                case 3:funcion_imagenes(fentrada);
+                         break;
+                }
+        }
+        
+        fclose(fentrada);
+        
+    }
+    while (opcion!=4);
+    
+    if(opcion==4)
+        printf("El programa ha finalizado\n");
+
+    return 0;
+}
+
+int menu()
+{
+    int opcion;
+
+    do
+    {
+    printf("Menu:\n");
+    printf("1.Leer\n");
+    printf("2.Guardar\n");
+    printf("3.Imagenes\n");
+    printf("4.Salir\n");
+    scanf("%d",&opcion);
+    }
+    while((opcion<1) || (opcion>4));
+    
+ return opcion;
+ 
+}
+
+void funcion_leer(FILE*fentrada)   // buscar enlaces
+{
+    
+    NODO *lista; // Lista con las URL detectadas
+    
+    //llamar a las funciones de la maquina de estado
+    lista = procesar_fichero (fentrada);
+    fclose (fentrada);
+    imprime_lista(lista);
+        
+                    
+}
+
+FILE* funcion_guardar(FILE *entrada) //guarda todas las urls encontradas en un fichero nuevo
+{
+    FILE *nuevo;
+    int cierre;
+    NODO *lista_guardar;
+    
+    lista_guardar = procesar_fichero (entrada);
+    fclose (entrada);
+    
+    
+    nuevo = fopen("Encontradas.txt","w");
+    
+    if(nuevo==NULL)
+        printf("No se ha podido abrir el fichero\n");
+    else
+    {
+        
+        imprime_guardar(lista_guardar,nuevo);
+        fclose(nuevo);
+        
+        if(cierre == EOF)
+            printf("No se ha podido cerrar el fichero\n");
+        else
+            printf("Fichero creado\n");
+    }
+    return nuevo;
+}
+
+void funcion_imagenes(FILE *fichero)
+{
+    NODO *lista_imagenes;
+    
+    lista_imagenes = procesar_fichero_imagenes (fichero);
+    fclose (fichero);
+    imprime_lista_imagenes(lista_imagenes);
+}
+
+NODO * procesar_fichero(FILE *fichero)
+{
+  char letra;
+  int estado=OUT_QUOTES;
+  char cadena[L],longitud;
+  NODO * lista_url=NULL;  // Inicialmente la lista de Urls esta vacia
+  
+  fscanf (fichero,"%c",&letra);
+  while (!feof(fichero))
+  {
+    switch (estado)
+    {
+      case OUT_QUOTES: if (letra == '"') // Si estando fuera aparecen comillas
+                       {
+                         estado=IN_QUOTES;  // Cambiamos de estado
+                         longitud=0;
+                       }
+                       break;
+
+      case IN_QUOTES: if (letra!='"')  // Si estando dentro aparece un caracter diferente a comillas
+                       {
+                         cadena[longitud]=letra;  // Se almacena en la cadena
+                         longitud++;
+                       }
+                       else  // Si aparecen comillas se interpretan como comillas de cierre
+                       {
+                         cadena[longitud]='\0';  // Se cierra la cadena y se procesa
+                         lista_url= procesa_cadena (cadena,lista_url);
+                         estado=OUT_QUOTES; // Y cambia de estado
+                       }
+                       break;
+    } // Fin del switch
+   fscanf (fichero,"%c",&letra);
+  } // Fin del while
+  return lista_url;
+}
+
+NODO * procesa_cadena (char cadena[],NODO *cabecera)   // Recibe una cadena y un enlace a una lista de NODO
+{
+  NODO *p;
+  if (strncmp (cadena,"http",4) == 0)  // Si la cadena comienza por http se considera una URL
+  {
+     p = (NODO *) malloc (sizeof(NODO));  // Se crea un nuevo NODO
+     if (p==NULL)
+       printf ("Memoria insuficiente procesando URLs\n");
+     else
+     {
+       strcpy (p->cadena,cadena);  // Se copia la cadena en el nuevo NODO
+       p->siguiente = cabecera;   // Se enlaza el nuevo NODO con el principio de la lista
+       cabecera = p;              // Se apunta el inicio de la lista al nuevo NODO
+     }
+  }
+  return cabecera;
+}
+
+void imprime_lista (NODO *p) // Recorre una lista de NODO e imprime las URL
+{
+    
+  printf ("URLs detectadas:\n");
+  while (p!=NULL)
+  {
+    printf ("%s\n",p->cadena);
+    p = p->siguiente;
+  }
+  
+  return ;
+}
+
+void imprime_guardar (NODO *p, FILE *fichero) // Recorre una lista de NODO e imprime las URL
+{
+    
+  
+  while (p!=NULL)
+  {
+    fprintf(fichero,"%s\n",p->cadena);
+    p = p->siguiente;
+  }
+  
+  return ;
+}
+
+//CODIGO IMAGENES
+
+NODO * procesar_fichero_imagenes(FILE *fichero)
+{
+  char letra;
+  int estado=OUT_QUOTES;
+  char cadena[L],longitud;
+  NODO * lista_imagenes=NULL;  // Inicialmente la lista de Urls esta vacia
+  
+  fscanf (fichero,"%c",&letra);
+  while (!feof(fichero))
+  {
+    switch (estado)
+    {
+      case OUT_QUOTES: if (letra == '"') // Si estando fuera aparecen comillas
+                       {
+                         estado=IN_QUOTES;  // Cambiamos de estado
+                         longitud=0;
+                       }
+                       break;
+
+      case IN_QUOTES: if (letra!='"')  // Si estando dentro aparece un caracter diferente a comillas
+                       {
+                         cadena[longitud]=letra;  // Se almacena en la cadena
+                         longitud++;
+                       }
+                       else  // Si aparecen comillas se interpretan como comillas de cierre
+                       {
+                         cadena[longitud]='\0';  // Se cierra la cadena y se procesa
+                         lista_imagenes= procesa_cadena_imagenes(cadena,lista_imagenes);
+                         estado=OUT_QUOTES; // Y cambia de estado
+                       }
+                       break;
+    } // Fin del switch
+   fscanf (fichero,"%c",&letra);
+  } // Fin del while
+  return lista_imagenes;
+}
+
+
+NODO * procesa_cadena_imagenes (char cadena[],NODO *cabecera)
+{
+  NODO *p;
+  if (strncmp (cadena,"images",6) == 0)  // Si la cadena comienza por images se considera una imagen
+  {
+     p = (NODO *) malloc (sizeof(NODO));  // Se crea un nuevo NODO
+     if (p==NULL)
+       printf ("Memoria insuficiente procesando URLs\n");
+     else
+     {
+       strcpy (p->cadena,cadena);  // Se copia la cadena en el nuevo NODO
+       p->siguiente = cabecera;   // Se enlaza el nuevo NODO con el principio de la lista
+       cabecera = p;              // Se apunta el inicio de la lista al nuevo NODO
+     }
+  }
+  return cabecera;
+}
+
+void imprime_lista_imagenes(NODO *p) // Recorre una lista de NODO e imprime las imagenes
+{
+  printf ("Imagenes detectadas:\n");
+  while (p!=NULL)
+  {
+    printf ("%s\n",p->cadena);
+    p = p->siguiente;
+  }
+}
