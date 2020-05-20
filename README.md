@@ -42,9 +42,7 @@ int menu()
  }
  
 ### Función Leer URLs:
-	//Abrir página html y mostrar enlaces existentes.
-	
-void funcion_leer(FILE*fentrada)   // buscar enlaces
+void funcion_leer(FILE*fentrada)  
 {
     
     NODO *lista; // Lista con las URL detectadas
@@ -55,9 +53,7 @@ void funcion_leer(FILE*fentrada)   // buscar enlaces
     imprime_lista(lista);                
 }
    
-### Función guardar URLs:
-	//Almacenar en un fichero los enlaces detectados por la función abrir.
-	
+### Función guardar URLs:	
 FILE* funcion_guardar(FILE *entrada) //guarda todas las urls encontradas en un fichero nuevo
 {
     FILE *nuevo;
@@ -87,7 +83,6 @@ FILE* funcion_guardar(FILE *entrada) //guarda todas las urls encontradas en un f
 }
 
 ###  Función ver imágenes:
-	Identificar qué enlaces de los anteriores son imágenes y mostrar las mismas en pantalla.
 void funcion_imagenes(FILE *fichero)
 {
     NODO *lista_imagenes;
@@ -103,59 +98,59 @@ NODO * procesar_fichero(FILE *fichero)
   char letra;
   int estado=OUT_QUOTES;
   char cadena[L],longitud;
-  NODO * lista_url=NULL;  // Inicialmente la lista de Urls esta vacia
+  NODO * lista_url=NULL;
   
   fscanf (fichero,"%c",&letra);
   while (!feof(fichero))
   {
     switch (estado)
     {
-      case OUT_QUOTES: if (letra == '"') // Si estando fuera aparecen comillas
+      case OUT_QUOTES: if (letra == '"') 
                        {
-                         estado=IN_QUOTES;  // Cambiamos de estado
+                         estado=IN_QUOTES;  
                          longitud=0;
                        }
                        break;
 
-      case IN_QUOTES: if (letra!='"')  // Si estando dentro aparece un caracter diferente a comillas
+      case IN_QUOTES: if (letra!='"')  
                        {
-                         cadena[longitud]=letra;  // Se almacena en la cadena
+                         cadena[longitud]=letra;  
                          longitud++;
                        }
-                       else  // Si aparecen comillas se interpretan como comillas de cierre
+                       else  
                        {
-                         cadena[longitud]='\0';  // Se cierra la cadena y se procesa
+                         cadena[longitud]='\0';  
                          lista_url= procesa_cadena (cadena,lista_url);
-                         estado=OUT_QUOTES; // Y cambia de estado
+                         estado=OUT_QUOTES; 
                        }
                        break;
-    } // Fin del switch
+    } 
    fscanf (fichero,"%c",&letra);
-  } // Fin del while
+  } 
   return lista_url;
 }
 
 ### Función procesa cadena (URLs)
-NODO * procesa_cadena (char cadena[],NODO *cabecera)   // Recibe una cadena y un enlace a una lista de NODO
+NODO * procesa_cadena (char cadena[],NODO *cabecera)   
 {
   NODO *p;
-  if (strncmp (cadena,"http",4) == 0)  // Si la cadena comienza por http se considera una URL
+  if (strncmp (cadena,"http",4) == 0)  
   {
      p = (NODO *) malloc (sizeof(NODO));  // Se crea un nuevo NODO
      if (p==NULL)
        printf ("Memoria insuficiente procesando URLs\n");
      else
      {
-       strcpy (p->cadena,cadena);  // Se copia la cadena en el nuevo NODO
-       p->siguiente = cabecera;   // Se enlaza el nuevo NODO con el principio de la lista
-       cabecera = p;              // Se apunta el inicio de la lista al nuevo NODO
+       strcpy (p->cadena,cadena);  
+       p->siguiente = cabecera;  
+       cabecera = p;              
      }
   }
   return cabecera;
 }
 
 ### Función imprimir URLs
-void imprime_lista (NODO *p) // Recorre una lista de NODO e imprime las URL
+void imprime_lista (NODO *p) 
 {
     
   printf ("URLs detectadas:\n");
@@ -169,7 +164,7 @@ void imprime_lista (NODO *p) // Recorre una lista de NODO e imprime las URL
 }
 
 ### Función crear fichero con las URLs
-void imprime_guardar (NODO *p, FILE *fichero) // Recorre una lista de NODO e imprime las URL
+void imprime_guardar (NODO *p, FILE *fichero) 
 {
     
   
@@ -188,35 +183,35 @@ NODO * procesar_fichero_imagenes(FILE *fichero)
   char letra;
   int estado=OUT_QUOTES;
   char cadena[L],longitud;
-  NODO * lista_imagenes=NULL;  // Inicialmente la lista de Urls esta vacia
+  NODO * lista_imagenes=NULL;  
   
   fscanf (fichero,"%c",&letra);
   while (!feof(fichero))
   {
     switch (estado)
     {
-      case OUT_QUOTES: if (letra == '"') // Si estando fuera aparecen comillas
+      case OUT_QUOTES: if (letra == '"') 
                        {
-                         estado=IN_QUOTES;  // Cambiamos de estado
+                         estado=IN_QUOTES; 
                          longitud=0;
                        }
                        break;
 
-      case IN_QUOTES: if (letra!='"')  // Si estando dentro aparece un caracter diferente a comillas
+      case IN_QUOTES: if (letra!='"')  
                        {
-                         cadena[longitud]=letra;  // Se almacena en la cadena
+                         cadena[longitud]=letra;  
                          longitud++;
                        }
-                       else  // Si aparecen comillas se interpretan como comillas de cierre
+                       else  
                        {
-                         cadena[longitud]='\0';  // Se cierra la cadena y se procesa
+                         cadena[longitud]='\0';  
                          lista_imagenes= procesa_cadena_imagenes(cadena,lista_imagenes);
-                         estado=OUT_QUOTES; // Y cambia de estado
+                         estado=OUT_QUOTES; 
                        }
                        break;
-    } // Fin del switch
+    } 
    fscanf (fichero,"%c",&letra);
-  } // Fin del while
+  } 
   return lista_imagenes;
 }
 
@@ -224,22 +219,22 @@ NODO * procesar_fichero_imagenes(FILE *fichero)
 NODO * procesa_cadena_imagenes (char cadena[],NODO *cabecera)
 {
   NODO *p;
-  if (strncmp (cadena,"images",6) == 0)  // Si la cadena comienza por images se considera una imagen
+  if (strncmp (cadena,"images",6) == 0)  
   {
-     p = (NODO *) malloc (sizeof(NODO));  // Se crea un nuevo NODO
+     p = (NODO *) malloc (sizeof(NODO));  
      if (p==NULL)
        printf ("Memoria insuficiente procesando URLs\n");
      else
      {
-       strcpy (p->cadena,cadena);  // Se copia la cadena en el nuevo NODO
-       p->siguiente = cabecera;   // Se enlaza el nuevo NODO con el principio de la lista
-       cabecera = p;              // Se apunta el inicio de la lista al nuevo NODO
+       strcpy (p->cadena,cadena);  
+       p->siguiente = cabecera;   
+       cabecera = p;              
      }
   }
   return cabecera;
 }
 ### Funcion imprimir imágenes
-void imprime_lista_imagenes(NODO *p) // Recorre una lista de NODO e imprime las imagenes
+void imprime_lista_imagenes(NODO *p) 
 {
   printf ("Imagenes detectadas:\n");
   while (p!=NULL)
